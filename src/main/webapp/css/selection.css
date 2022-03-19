@@ -1,0 +1,22 @@
+/* Put your css in here */
+
+.dual-list .list-group {
+    margin-top: 8px;
+}
+
+.list-arrows {
+	padding-top: 100px;
+	vertical-align: middle;
+}
+
+.list-arrows button {
+    margin-bottom: 20px;
+}
+.list-group-item.active, .list-group-item.active:hover, .list-group-item.active:focus {
+  border-color: white;
+}
+.input-group-addon {
+  top: 0;
+}
+
+
