@@ -109,13 +109,13 @@ public class LOCKSSDashboardController {
 		
 		while(itLOCKSSBox.hasNext()) {
 			Boolean boxInDatabase = false;
-			String IP = itLOCKSSBox.next().getIpAddress();
+			String IPaddress = itLOCKSSBox.next().getIpAddress();
 			Iterator<LOCKSSBoxInfo> itLOCKSSBoxInfo = lockssBoxesInfo.iterator();
 			while (itLOCKSSBoxInfo.hasNext()) {
 				
 				LOCKSSBoxInfo currentLOCKSSBoxInfo = itLOCKSSBoxInfo.next();
 				
-				if (currentLOCKSSBoxInfo.getBox().getIpAddress().equals(IP) ) {
+				if (currentLOCKSSBoxInfo.getBox().getIpAddress().equals(IPaddress) ) {
 					boxInDatabase= true;
 					currentLOCKSSBoxInfo.setDatabase(true);
 					allLOCKSSBoxInfo.add(currentLOCKSSBoxInfo);
@@ -125,7 +125,44 @@ public class LOCKSSDashboardController {
 			}
 			// if box was not found in the database, add a new box
 			if (! boxInDatabase) {
-				allLOCKSSBoxInfo.add(new LOCKSSBoxInfo (new LOCKSSBox(IP), "unknown", "unknown", 0.0 , 0.0, "unknown", "unknown", false, false));
+				
+				
+				String geourl = "https://freegeoip.app/xml/"+ IPaddress;
+				
+				String userName = "Unknown";
+				String password = "Unknown";
+				String boxname = "Unknown";
+				Double longitude = 0.0;
+				Double latitude = 0.0;
+				String country = "Unknown";
+				String name = "Unknown";
+				
+
+				DocumentBuilderFactory geofactory = DocumentBuilderFactory.newInstance();
+				factory.setNamespaceAware(true);
+				try{
+					DocumentBuilder db = factory.newDocumentBuilder();
+
+					Document doc = db.parse(new URL(geourl).openStream());
+					doc.getDocumentElement().normalize();
+					Element response = doc.getDocumentElement();
+
+					if (response.getNodeType() == Node.ELEMENT_NODE) {
+						country = response.getElementsByTagName("CountryName").item(0).getTextContent();
+						longitude = Double.parseDouble(response.getElementsByTagName("Longitude").item(0).getTextContent());
+						latitude = Double.parseDouble(response.getElementsByTagName("Latitude").item(0).getTextContent());
+						name = response.getElementsByTagName("City").item(0).getTextContent();
+						country= response.getElementsByTagName("CountryName").item(0).getTextContent();
+					}
+
+				}
+				catch(Exception e){
+					System.out.println(e.toString());
+
+				}
+				
+				allLOCKSSBoxInfo.add(new LOCKSSBoxInfo (new LOCKSSBox(IPaddress), userName, password, longitude , latitude, country + " (est.)", name + " (est.)", false, false));
+			
 			}
 			
 		}
